@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Climbing Grade Converter</title>
+<style type="text/css">
+
+body {
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive; 
+    background-color: #f0f8ff; /* リードをデフォルトにするため、少し爽やかな色に変更 */
+    padding: 20px;
+    transition: background-color 0.5s;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+h1 {
+    color: #4682b4;
+    font-size: 24px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.mode-selector {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    justify-content: center;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #4682b4;
+    border-radius: 25px;
+    background-color: white;
+    color: #4682b4;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+    transition: all 0.3s;
+    outline: none;
+}
+
+/* ボルダリングモード時の色 */
+body.mode-bouldering { background-color: #fdf5e6; }
+body.mode-bouldering h1 { color: #ff6347; }
+body.mode-bouldering .mode-btn { border-color: #ff6347; color: #ff6347; }
+body.mode-bouldering .mode-btn.active { background-color: #ff6347; color: white; }
+body.mode-bouldering select, body.mode-bouldering button#convertBtn { border-color: #ff6347; color: #ff6347; }
+body.mode-bouldering button#convertBtn { background-color: #ff6347; color: white; }
+body.mode-bouldering label { color: #ff6347; }
+
+/* リードモード時の色（デフォルト） */
+body.mode-lead { background-color: #f0f8ff; }
+body.mode-lead h1 { color: #4682b4; }
+body.mode-lead .mode-btn { border-color: #4682b4; color: #4682b4; }
+body.mode-lead .mode-btn.active { background-color: #4682b4; color: white; }
+body.mode-lead select, body.mode-lead button#convertBtn { border-color: #4682b4; color: #4682b4; }
+body.mode-lead button#convertBtn { background-color: #4682b4; color: white; }
+body.mode-lead label { color: #4682b4; }
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+select, button#convertBtn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border-radius: 10px;
+    border: 2px solid;
+    background-color: #ffffff;
+    font-size: 16px;
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive; 
+    box-sizing: border-box;
+}
+
+button#convertBtn {
+    cursor: pointer;
+    transition: opacity 0.3s;
+    margin-top: 25px;
+    font-weight: bold;
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+button#convertBtn:hover {
+    opacity: 0.8;
+}
+
+.result-container {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 30px;
+    padding: 10px;
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+    border: solid 3px #fff;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.result {
+    display: inline-block;
+    position: relative;
+    margin: 0;
+    padding: 15px 20px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 2px solid #ddd;
+    color: #333;
+    line-height: 1.6;
+    min-width: 200px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+}
+
+.result::before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    left: -12px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 12px solid #ffffff;
+    z-index: 2;
+}
+
+.result::after {
+    content: "";
+    position: absolute;
+    top: 19px;
+    left: -15px;
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    border-right: 14px solid #ddd;
+    z-index: 1;
+}
+
+.highlight {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+</style>
+</head>
+
+<body class="mode-lead">
+<div class="container">
+    <h1 id="mainTitle">CLIMBING GRADE CONVERTER</h1>
+    
+    <div class="mode-selector">
+        <button id="modeLead" class="mode-btn active" onclick="setMode('lead')">Lead Climbing</button>
+        <button id="modeBouldering" class="mode-btn" onclick="setMode('bouldering')">Bouldering</button>
+    </div>
+    
+    <label for="context">1. Select Base System:</label>
+    <select id="context"></select>
+    
+    <label for="inputGrade">2. Select Your Grade:</label>
+    <select id="inputGrade"></select>
+    
+    <button id="convertBtn">CONVERSION</button>
+    
+    <div id="resultContainer" class="result-container" style="display:none;">
+        <img src="https://cdn.amebaowndme.com/madrid-prd/madrid-web/images/sites/499076/8ed7bbd61b78348fa635ba325a401c98_8e6ecd7366534889afd88c6472797869.png" alt="Avatar" class="avatar">
+        <div id="result" class="result"></div>
+    </div>
+</div>
+
+<script>
+const allData = {
+    bouldering: {
+        systems: [
+            { id: 'japan', label: 'Japanese (kyū/dan)' },
+            { id: 'usa', label: 'USA (V-Grade)' },
+            { id: 'french', label: 'French (Fontainebleau)' }
+        ],
+        data: {
+            japan: {
+                "6級(kyū)":  { french: "3+ ~ 4",   usa: "V0- ~ V0" },
+                "5級(kyū)":  { french: "4+ ~ 5",   usa: "V0+ ~ V1" },
+                "4級(kyū)":  { french: "5+ ~ 6a",  usa: "V2 ~ V3" },
+                "3級(kyū)":  { french: "6a+ ~ 6b", usa: "V3 ~ V4" },
+                "2級(kyū)":  { french: "6b+ ~ 6c", usa: "V4 ~ V5" },
+                "1級(kyū)":  { french: "6c+ ~ 7a", usa: "V5 ~ V6" },
+                "初段(dan)": { french: "7a+ ~ 7b", usa: "V7" },
+                "2段(dan)":  { french: "7b+ ~ 7c", usa: "V8 ~ V9" },
+                "3段(dan)":  { french: "7c+ ~ 8a", usa: "V10 ~ V11" },
+                "4段(dan)":  { french: "8a+ ~ 8b", usa: "V12 ~ V13" },
+                "5段(dan)":  { french: "8b+ ~ 8c", usa: "V14 ~ V15" },
+                "6段(dan)":  { french: "8c+ ~ 9a", usa: "V16 ~ V17" }
+            },
+            usa: {
+                "V0-": { japan: "6級", french: "3+" },
+                "V0":  { japan: "6級", french: "4" },
+                "V0+": { japan: "5級", french: "4+" },
+                "V1":  { japan: "5級", french: "5" },
+                "V2":  { japan: "4級", french: "5+" },
+                "V3":  { japan: "4 ~ 3級", french: "6a ~ 6a+" },
+                "V4":  { japan: "3 ~ 2級", french: "6b ~ 6b+" },
+                "V5":  { japan: "2 ~ 1級", french: "6c ~ 6c+" },
+                "V6":  { japan: "1級", french: "7a" },
+                "V7":  { japan: "初段", french: "7a+" },
+                "V8":  { japan: "初 ~ 2段", french: "7b ~ 7b+" },
+                "V9":  { japan: "2段", french: "7c" },
+                "V10": { japan: "3段", french: "7c+" },
+                "V11": { japan: "3段", french: "8a" },
+                "V12": { japan: "4段", french: "8a+" },
+                "V13": { japan: "4段", french: "8b" },
+                "V14": { japan: "5段", french: "8b+" },
+                "V15": { japan: "5段", french: "8c" },
+                "V16": { japan: "6段", french: "8c+" },
+                "V17": { japan: "6段", french: "9a" }
+            },
+            french: {
+                "3+":  { japan: "6級", usa: "V0-" },
+                "4":   { japan: "6級", usa: "V0" },
+                "4+":  { japan: "5級", usa: "V0+" },
+                "5":   { japan: "5級", usa: "V1" },
+                "5+":  { japan: "4級", usa: "V2" },
+                "6a":  { japan: "4級", usa: "V2 ~ V3" },
+                "6a+": { japan: "3級", usa: "V3" },
+                "6b":  { japan: "3級", usa: "V3 ~ V4" },
+                "6b+": { japan: "2級", usa: "V4" },
+                "6c":  { japan: "2級", usa: "V4 ~ V5" },
+                "6c+": { japan: "1級", usa: "V5 ~ V6" },
+                "7a":  { japan: "1級", usa: "V6" },
+                "7a+": { japan: "初段", usa: "V7" },
+                "7b":  { japan: "初段", usa: "V7 ~ V8" },
+                "7b+": { japan: "2段", usa: "V8 ~ V9" },
+                "7c":  { japan: "2段", usa: "V9" },
+                "7c+": { japan: "3段", usa: "V10" },
+                "8a":  { japan: "3段", usa: "V11" },
+                "8a+": { japan: "4段", usa: "V12" },
+                "8b":  { japan: "4段", usa: "V13" },
+                "8b+": { japan: "5段", usa: "V14" },
+                "8c":  { japan: "5段", usa: "V15" },
+                "8c+": { japan: "6段", usa: "V16" },
+                "9a":  { japan: "6段", usa: "V17" }
+            }
+        }
+    },
+    lead: {
+        systems: [
+            { id: 'french_lead', label: 'French (Lead)' },
+            { id: 'usa_lead', label: 'USA (YDS/Decimal)' },
+            { id: 'uiaa', label: 'UIAA' }
+        ],
+        data: {
+            french_lead: {
+                "5a":  { usa: "5.6 ~ 5.7", uiaa: "V- ~ V" },
+                "5b":  { usa: "5.7 ~ 5.8", uiaa: "V ~ V+" },
+                "5c":  { usa: "5.8 ~ 5.9", uiaa: "V+ ~ VI-" },
+                "6a":  { usa: "5.9 ~ 5.10a", uiaa: "VI- ~ VI" },
+                "6a+": { usa: "5.10a ~ 5.10b", uiaa: "VI ~ VI+" },
+                "6b":  { usa: "5.10b ~ 5.10d", uiaa: "VI+ ~ VII" },
+                "6b+": { usa: "5.10d ~ 5.11a", uiaa: "VII ~ VII+" },
+                "6c":  { usa: "5.11a ~ 5.11b", uiaa: "VII+" },
+                "6c+": { usa: "5.11b ~ 5.11c", uiaa: "VIII-" },
+                "7a":  { usa: "5.11c ~ 5.11d", uiaa: "VIII- ~ VIII" },
+                "7a+": { usa: "5.11d ~ 5.12a", uiaa: "VIII" },
+                "7b":  { usa: "5.12a ~ 5.12b", uiaa: "VIII ~ VIII+" },
+                "7b+": { usa: "5.12b ~ 5.12c", uiaa: "VIII+ ~ IX-" },
+                "7c":  { usa: "5.12c ~ 5.12d", uiaa: "IX- ~ IX" },
+                "7c+": { usa: "5.12d ~ 5.13a", uiaa: "IX ~ IX+" },
+                "8a":  { usa: "5.13b", uiaa: "IX+ ~ X-" },
+                "8a+": { usa: "5.13c", uiaa: "X- ~ X" },
+                "8b":  { usa: "5.13d", uiaa: "X" },
+                "8b+": { usa: "5.14a", uiaa: "X+" },
+                "8c":  { usa: "5.14b", uiaa: "X+ ~ XI-" },
+                "8c+": { usa: "5.14c", uiaa: "XI- ~ XI" },
+                "9a":  { usa: "5.14d", uiaa: "XI" },
+                "9a+": { usa: "5.15a", uiaa: "XI ~ XI+" },
+                "9b":  { usa: "5.15b", uiaa: "XI+ ~ XII-" },
+                "9b+": { usa: "5.15c", uiaa: "XII- ~ XII" },
+                "9c":  { usa: "5.15d", uiaa: "XII ~ XII+" }
+            },
+            usa_lead: {
+                "5.7":   { french: "5a ~ 5b", uiaa: "V" },
+                "5.8":   { french: "5b ~ 5c", uiaa: "V+" },
+                "5.9":   { french: "5c ~ 6a", uiaa: "VI-" },
+                "5.10a": { french: "6a ~ 6a+", uiaa: "VI" },
+                "5.10b": { french: "6a+ ~ 6b", uiaa: "VI+" },
+                "5.10c": { french: "6b", uiaa: "VII-" },
+                "5.10d": { french: "6b ~ 6b+", uiaa: "VII" },
+                "5.11a": { french: "6b+ ~ 6c", uiaa: "VII ~ VII+" },
+                "5.12a": { french: "7a+ ~ 7b", uiaa: "VIII" },
+                "5.13a": { french: "7c+", uiaa: "IX ~ IX+" },
+                "5.14a": { french: "8b+", uiaa: "X+" },
+                "5.15a": { french: "9a+", uiaa: "XI ~ XI+" }
+            },
+            uiaa: {
+                "V":    { french: "5a ~ 5b", usa: "5.7" },
+                "VI":   { french: "6a ~ 6a+", usa: "5.10a" },
+                "VII":  { french: "6b ~ 6b+", usa: "5.10d" },
+                "VIII": { french: "7a+", usa: "5.11d ~ 5.12a" },
+                "IX":   { french: "7c ~ 7c+", usa: "5.12d" },
+                "X":    { french: "8a+ ~ 8b", usa: "5.13d" }
+            }
+        }
+    }
+};
+
+let currentMode = 'lead'; // デフォルトをリードに設定
+const encouragementMessages = ["Courage! 💪🏻", "Keep Pushing! 💪🏻", "Allez! 💪🏻", "Ganba! 💪🏻", "Stay Strong! 💪🏻"];
+
+function setMode(mode) {
+    currentMode = mode;
+    
+    // ボディのクラスを切り替えて配色を変更
+    document.body.className = (mode === 'lead') ? 'mode-lead' : 'mode-bouldering';
+    
+    // ボタンのactive状態を更新
+    document.getElementById('modeLead').classList.toggle('active', mode === 'lead');
+    document.getElementById('modeBouldering').classList.toggle('active', mode === 'bouldering');
+    
+    // システム選択肢を更新
+    const contextSelect = document.getElementById('context');
+    const systems = allData[mode].systems;
+    contextSelect.innerHTML = systems.map(s => `<option value="${s.id}">${s.label}</option>`).join('');
+    
+    updateGradeOptions();
+}
+
+function updateGradeOptions() {
+    const contextSelect = document.getElementById('context');
+    const gradeSelect = document.getElementById('inputGrade');
+    const systemId = contextSelect.value;
+    
+    const grades = Object.keys(allData[currentMode].data[systemId]);
+    
+    // ソート処理（French Bouldering用）
+    if (systemId === 'french') {
+        const order = ["3+", "4", "4+", "5", "5+"];
+        grades.sort((a, b) => {
+            const idxA = order.indexOf(a);
+            const idxB = order.indexOf(b);
+            if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+            if (idxA !== -1) return -1;
+            if (idxB !== -1) return 1;
+            return a.localeCompare(b);
+        });
+    }
+
+    gradeSelect.innerHTML = grades.map(g => `<option value="${g}">${g}</option>`).join('');
+    document.getElementById('resultContainer').style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const contextSelect = document.getElementById('context');
+    const convertBtn = document.getElementById('convertBtn');
+    
+    contextSelect.addEventListener('change', updateGradeOptions);
+    
+    convertBtn.addEventListener('click', () => {
+        const systemId = contextSelect.value;
+        const gradeId = document.getElementById('inputGrade').value;
+        const data = allData[currentMode].data[systemId][gradeId];
+        const encouragement = encouragementMessages[Math.floor(Math.random() * encouragementMessages.length)];
+        
+        const highlightColor = (currentMode === 'lead') ? '#4682b4' : '#ff6347';
+        let resultHTML = `<span class="highlight" style="color:${highlightColor}">${gradeId}</span> is approximately:<br><br>`;
+        
+        if (currentMode === 'bouldering') {
+            if (systemId === 'japan') {
+                resultHTML += `🇺🇸 USA: <b>${data.usa}</b><br>🇫🇷 French: <b>${data.french}</b><br>`;
+            } else if (systemId === 'usa') {
+                resultHTML += `🇯🇵 Japan: <b>${data.japan}</b><br>🇫🇷 French: <b>${data.french}</b><br>`;
+            } else {
+                resultHTML += `🇯🇵 Japan: <b>${data.japan}</b><br>🇺🇸 USA: <b>${data.usa}</b><br>`;
+            }
+        } else {
+            if (systemId === 'french_lead') {
+                resultHTML += `🇺🇸 USA: <b>${data.usa}</b><br>⛰️ UIAA: <b>${data.uiaa}</b><br>`;
+            } else if (systemId === 'usa_lead') {
+                resultHTML += `🇫🇷 French: <b>${data.french}</b><br>⛰️ UIAA: <b>${data.uiaa}</b><br>`;
+            } else {
+                resultHTML += `🇫🇷 French: <b>${data.french}</b><br>🇺🇸 USA: <b>${data.usa}</b><br>`;
+            }
+        }
+        
+        resultHTML += `<br>«${encouragement}»`;
+        document.getElementById('result').innerHTML = resultHTML;
+        document.getElementById('resultContainer').style.display = 'flex';
+    });
+
+    // デフォルトをリードに設定して初期化
+    setMode('lead');
+});
+</script>
+</body>
+</html>
