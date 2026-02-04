@@ -7,7 +7,6 @@
 <style type="text/css">
 
 body {
-    /* どのOSでも美しく見えるフォントセットに変更 */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
     background-color: #f0f8ff; 
     padding: 10px;
@@ -92,7 +91,7 @@ select, button#convertBtn {
     font-size: 16px;
     font-family: inherit;
     box-sizing: border-box;
-    appearance: none; /* デフォルトの矢印をリセット（iOS対応） */
+    appearance: none;
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
     background-position: right 12px top 50%;
@@ -112,7 +111,6 @@ button#convertBtn:active {
     transform: scale(0.98);
 }
 
-/* Result Section */
 .result-container {
     display: flex;
     align-items: flex-start;
@@ -227,7 +225,9 @@ button#convertBtn:active {
 </div>
 
 <script>
+// --- Data Structure ---
 const allData = {
+    // === BOULDERING DATA ===
     bouldering: {
         systems: [
             { id: 'japan', label: 'Japan (kyū/dan)' },
@@ -235,19 +235,20 @@ const allData = {
             { id: 'french', label: 'French' }
         ],
         data: {
+            // Updated based on user request
             japan: {
-                "6級(kyū)":  { french: "3+ ~ 4",   usa: "V0- ~ V0" },
-                "5級(kyū)":  { french: "4+ ~ 5",   usa: "V0+ ~ V1" },
-                "4級(kyū)":  { french: "5+ ~ 6a",  usa: "V2 ~ V3" },
-                "3級(kyū)":  { french: "6a+ ~ 6b", usa: "V3 ~ V4" },
-                "2級(kyū)":  { french: "6b+ ~ 6c", usa: "V4 ~ V5" },
-                "1級(kyū)":  { french: "6c+ ~ 7a", usa: "V5 ~ V6" },
-                "初段(dan)": { french: "7a+ ~ 7b", usa: "V7" },
-                "2段(dan)":  { french: "7b+ ~ 7c", usa: "V8 ~ V9" },
-                "3段(dan)":  { french: "7c+ ~ 8a", usa: "V10 ~ V11" },
-                "4段(dan)":  { french: "8a+ ~ 8b", usa: "V12 ~ V13" },
-                "5段(dan)":  { french: "8b+ ~ 8c", usa: "V14 ~ V15" },
-                "6段(dan)":  { french: "8c+ ~ 9a", usa: "V16 ~ V17" }
+                "6級(kyū)":  { usa: "V0- ~ V0",   french: "3+ ~ 4" },
+                "5級(kyū)":  { usa: "V0+ ~ V1",   french: "4+ ~ 5" },
+                "4級(kyū)":  { usa: "V2 ~ V3",    french: "5+ ~ 6a" },
+                "3級(kyū)":  { usa: "V3 ~ V4",    french: "6a+ ~ 6b" },
+                "2級(kyū)":  { usa: "V4 ~ V5",    french: "6b+ ~ 6c" },
+                "1級(kyū)":  { usa: "V5 ~ V6",    french: "6c+ ~ 7a" },
+                "初段(dan)": { usa: "V7",          french: "7a+ ~ 7b" },
+                "2段(dan)":  { usa: "V8 ~ V9",    french: "7b+ ~ 7c" },
+                "3段(dan)":  { usa: "V10 ~ V11",  french: "7c+ ~ 8a" },
+                "4段(dan)":  { usa: "V12 ~ V13",  french: "8a+ ~ 8b" },
+                "5段(dan)":  { usa: "V14 ~ V15",  french: "8b+ ~ 8c" },
+                "6段(dan)":  { usa: "V16 ~ V17",  french: "8c+ ~ 9a" }
             },
             usa: {
                 "V0-": { japan: "6級", french: "3+" },
@@ -299,62 +300,95 @@ const allData = {
             }
         }
     },
+    // === LEAD CLIMBING DATA ===
     lead: {
         systems: [
             { id: 'french_lead', label: 'French' },
-            { id: 'usa_lead', label: 'USA (YDS/Decimal)' },
+            { id: 'usa_lead', label: 'USA (YDS)' },
             { id: 'uiaa', label: 'UIAA' }
         ],
         data: {
             french_lead: {
-                "5a":  { usa: "5.6~5.7", uiaa: "V-~V" },
-                "5b":  { usa: "5.7~5.8", uiaa: "V~V+" },
-                "5c":  { usa: "5.8~5.9", uiaa: "V+~VI-" },
-                "6a":  { usa: "5.9~5.10a", uiaa: "VI-~VI" },
-                "6a+": { usa: "5.10a~5.10b", uiaa: "VI~VI+" },
-                "6b":  { usa: "5.10b~5.10d", uiaa: "VI+~VII" },
-                "6b+": { usa: "5.10d~5.11a", uiaa: "VII~VII+" },
-                "6c":  { usa: "5.11a~5.11b", uiaa: "VII+" },
-                "6c+": { usa: "5.11b~5.11c", uiaa: "VIII-" },
-                "7a":  { usa: "5.11c~5.11d", uiaa: "VIII-~VIII" },
-                "7a+": { usa: "5.11d~5.12a", uiaa: "VIII" },
-                "7b":  { usa: "5.12a~5.12b", uiaa: "VIII~VIII+" },
-                "7b+": { usa: "5.12b~5.12c", uiaa: "VIII+~IX-" },
-                "7c":  { usa: "5.12c~5.12d", uiaa: "IX-~IX" },
-                "7c+": { usa: "5.12d~5.13a", uiaa: "IX~IX+" },
-                "8a":  { usa: "5.13b", uiaa: "IX+~X-" },
-                "8a+": { usa: "5.13c", uiaa: "X-~X" },
-                "8b":  { usa: "5.13d", uiaa: "X" },
-                "8b+": { usa: "5.14a", uiaa: "X+" },
-                "8c":  { usa: "5.14b", uiaa: "X+~XI-" },
-                "8c+": { usa: "5.14c", uiaa: "XI-~XI" },
-                "9a":  { usa: "5.14d", uiaa: "XI" },
-                "9a+": { usa: "5.15a", uiaa: "XI~XI+" },
-                "9b":  { usa: "5.15b", uiaa: "XI+~XII-" },
-                "9b+": { usa: "5.15c", uiaa: "XII-~XII" },
-                "9c":  { usa: "5.15d", uiaa: "XII~XII+" }
+                "5c":  { uiaa: "V+ ~ VI-",     usa: "5.8 ~ 5.9" },
+                "6a":  { uiaa: "VI- ~ VI",     usa: "5.9 ~ 5.10a" },
+                "6a+": { uiaa: "VI+",          usa: "5.10a ~ 5.10b" },
+                "6b":  { uiaa: "VII-",         usa: "5.10b ~ 5.10c" },
+                "6b+": { uiaa: "VII ~ VII+",   usa: "5.10d ~ 5.11a" },
+                "6c":  { uiaa: "VII+",         usa: "5.11a ~ 5.11b" },
+                "6c+": { uiaa: "VIII-",        usa: "5.11b ~ 5.11c" },
+                "7a":  { uiaa: "VIII- ~ VIII", usa: "5.11c ~ 5.11d" },
+                "7a+": { uiaa: "VIII",         usa: "5.11d ~ 5.12a" },
+                "7b":  { uiaa: "VIII ~ VIII+", usa: "5.12a ~ 5.12b" },
+                "7b+": { uiaa: "VIII+ ~ IX-",  usa: "5.12b ~ 5.12c" },
+                "7c":  { uiaa: "IX- ~ IX",     usa: "5.12c ~ 5.12d" },
+                "7c+": { uiaa: "IX ~ IX+",     usa: "5.12d ~ 5.13a" },
+                "8a":  { uiaa: "IX+ ~ X-",     usa: "5.13b" },
+                "8a+": { uiaa: "X- ~ X",       usa: "5.13c" },
+                "8b":  { uiaa: "X",            usa: "5.13d" },
+                "8b+": { uiaa: "X+",           usa: "5.14a" },
+                "8c":  { uiaa: "X+ ~ XI-",     usa: "5.14b" },
+                "8c+": { uiaa: "XI- ~ XI",     usa: "5.14c" },
+                "9a":  { uiaa: "XI",           usa: "5.14d" },
+                "9a+": { uiaa: "XI ~ XI+",     usa: "5.15a" },
+                "9b":  { uiaa: "XI+",          usa: "5.15b" },
+                "9b+": { uiaa: "XI+ ~ XII-",   usa: "5.15c" },
+                "9c":  { uiaa: "XII-",         usa: "5.15d" }
             },
             usa_lead: {
-                "5.7":   { french: "5a~5b", uiaa: "V" },
-                "5.8":   { french: "5b~5c", uiaa: "V+" },
-                "5.9":   { french: "5c~6a", uiaa: "VI-" },
-                "5.10a": { french: "6a~6a+", uiaa: "VI" },
-                "5.10b": { french: "6a+~6b", uiaa: "VI+" },
-                "5.10c": { french: "6b", uiaa: "VII-" },
-                "5.10d": { french: "6b~6b+", uiaa: "VII" },
-                "5.11a": { french: "6b+~6c", uiaa: "VII~VII+" },
-                "5.12a": { french: "7a+~7b", uiaa: "VIII" },
-                "5.13a": { french: "7c+", uiaa: "IX~IX+" },
-                "5.14a": { french: "8b+", uiaa: "X+" },
-                "5.15a": { french: "9a+", uiaa: "XI~XI+" }
+                "5.6":   { french: "4 ~ 5a",      uiaa: "V-" },
+                "5.7":   { french: "5a ~ 5b",     uiaa: "V" },
+                "5.8":   { french: "5b ~ 5c",     uiaa: "V+" },
+                "5.9":   { french: "5c ~ 6a",     uiaa: "VI-" },
+                "5.10a": { french: "6a ~ 6a+",    uiaa: "VI" },
+                "5.10b": { french: "6a+ ~ 6b",    uiaa: "VI+" },
+                "5.10c": { french: "6b",          uiaa: "VII-" },
+                "5.10d": { french: "6b ~ 6b+",    uiaa: "VII" },
+                "5.11a": { french: "6b+ ~ 6c",    uiaa: "VII ~ VII+" },
+                "5.11b": { french: "6c ~ 6c+",    uiaa: "VII+ ~ VIII-" },
+                "5.11c": { french: "6c+ ~ 7a",    uiaa: "VIII-" },
+                "5.11d": { french: "7a ~ 7a+",    uiaa: "VIII- ~ VIII" },
+                "5.12a": { french: "7a+ ~ 7b",    uiaa: "VIII" },
+                "5.12b": { french: "7b ~ 7b+",    uiaa: "VIII+" },
+                "5.12c": { french: "7b+ ~ 7c",    uiaa: "IX-" },
+                "5.12d": { french: "7c ~ 7c+",    uiaa: "IX" },
+                "5.13a": { french: "7c+",         uiaa: "IX ~ IX+" },
+                "5.13b": { french: "8a",          uiaa: "IX+ ~ X-" },
+                "5.13c": { french: "8a+",         uiaa: "X-" },
+                "5.13d": { french: "8b",          uiaa: "X" },
+                "5.14a": { french: "8b+",         uiaa: "X+" },
+                "5.14b": { french: "8c",          uiaa: "X+ ~ XI-" },
+                "5.14c": { french: "8c+",         uiaa: "XI- ~ XI" },
+                "5.14d": { french: "9a",          uiaa: "XI" },
+                "5.15a": { french: "9a+",         uiaa: "XI ~ XI+" },
+                "5.15b": { french: "9b",          uiaa: "XI+ ~ XII-" },
+                "5.15c": { french: "9b+",         uiaa: "XII- ~ XII" },
+                "5.15d": { french: "9c",          uiaa: "XII+" }
             },
             uiaa: {
-                "V":    { french: "5a~5b", usa: "5.7" },
-                "VI":   { french: "6a~6a+", usa: "5.10a" },
-                "VII":  { french: "6b~6b+", usa: "5.10d" },
-                "VIII": { french: "7a+", usa: "5.11d~5.12a" },
-                "IX":   { french: "7c~7c+", usa: "5.12d" },
-                "X":    { french: "8a+~8b", usa: "5.13d" }
+                "V-":    { french: "4 ~ 5a", usa: "5.6" },
+                "V":     { french: "5a ~ 5b", usa: "5.7" },
+                "V+":    { french: "5b ~ 5c", usa: "5.8" },
+                "VI-":   { french: "5c ~ 6a", usa: "5.9" },
+                "VI":    { french: "6a ~ 6a+", usa: "5.10a" },
+                "VI+":   { french: "6a+ ~ 6b", usa: "5.10b" },
+                "VII-":  { french: "6b", usa: "5.10c" },
+                "VII":   { french: "6b ~ 6b+", usa: "5.10d" },
+                "VII+":  { french: "6c", usa: "5.11a ~ 5.11b" },
+                "VIII-": { french: "6c+ ~ 7a", usa: "5.11b ~ 5.11d" },
+                "VIII":  { french: "7a+", usa: "5.11d ~ 5.12a" },
+                "VIII+": { french: "7b ~ 7b+", usa: "5.12b" },
+                "IX-":   { french: "7b+ ~ 7c", usa: "5.12c" },
+                "IX":    { french: "7c ~ 7c+", usa: "5.12d" },
+                "IX+":   { french: "7c+ ~ 8a", usa: "5.13a ~ 5.13b" },
+                "X-":    { french: "8a ~ 8a+", usa: "5.13b ~ 5.13c" },
+                "X":     { french: "8a+ ~ 8b", usa: "5.13d" },
+                "X+":    { french: "8b+", usa: "5.14a" },
+                "XI-":   { french: "8c ~ 8c+", usa: "5.14b ~ 5.14c" },
+                "XI":    { french: "8c+ ~ 9a", usa: "5.14c ~ 5.14d" },
+                "XI+":   { french: "9a ~ 9a+", usa: "5.14d ~ 5.15a" },
+                "XII-":  { french: "9a+ ~ 9b", usa: "5.15a ~ 5.15b" },
+                "XII":   { french: "9b ~ 9b+", usa: "5.15b ~ 5.15c" },
+                "XII+":  { french: "9b+ ~ 9c", usa: "5.15c ~ 5.15d" }
             }
         }
     }
@@ -382,16 +416,12 @@ function updateGradeOptions() {
     const systemId = contextSelect.value;
     const grades = Object.keys(allData[currentMode].data[systemId]);
     
-    if (systemId === 'french') {
-        const order = ["3+", "4", "4+", "5", "5+"];
-        grades.sort((a, b) => {
-            const idxA = order.indexOf(a);
-            const idxB = order.indexOf(b);
-            if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-            if (idxA !== -1) return -1;
-            if (idxB !== -1) return 1;
-            return a.localeCompare(b);
-        });
+    // Sort logic for display
+    if (systemId === 'japan') {
+        const order = ["6級(kyū)", "5級(kyū)", "4級(kyū)", "3級(kyū)", "2級(kyū)", "1級(kyū)", "初段(dan)", "2段(dan)", "3段(dan)", "4段(dan)", "5段(dan)", "6段(dan)"];
+        grades.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+    } else {
+        grades.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
     }
 
     gradeSelect.innerHTML = grades.map(g => `<option value="${g}">${g}</option>`).join('');
